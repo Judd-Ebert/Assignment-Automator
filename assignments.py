@@ -11,7 +11,7 @@ load_dotenv()
 
 
 
-webcal_url = "webcal://lovett.myschoolapp.com/podium/feed/iCal.aspx?z=IAhclKLuVpcvWl8%2fhVewWbVk3mPx0AmbGjl%2fFGp8evSFrFQVUytNZrYeVFneXBrcwOAnaAEyRAO%2bqkbZ4N%2fAWw%3d%3d"
+webcal_url = os.environ.get("WEBCAL_URL")
 
 notion = Client(auth=os.environ["NOTION_TOKEN"])
 
