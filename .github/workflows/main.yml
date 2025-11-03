@@ -28,4 +28,5 @@ jobs:
       env:
         NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         DATABASE_ID: ${{ secrets.DATABASE_ID }}
+        WEBCAL_URL: ${{ secrets.WEBCAL_URL }}
       run: python assignments.py
