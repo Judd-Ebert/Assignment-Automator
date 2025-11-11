@@ -5,6 +5,7 @@ import requests
 from urllib.parse import urlparse
 from icalendar import Calendar
 from datetime import datetime, timedelta, date
+from zoneinfo import ZoneInfo
 
 load_dotenv()
 
@@ -120,22 +121,32 @@ def export_to_notion(events):
             print(f"Skipped (already exists): {event['summary']}")
             continue
         
-        #Convert datetime to ISO
+        #Convert datetime to ISO - full day event on due date
         start_date = event['dtstart']
         end_date = event['dtend']
         
-        if isinstance(start_date, datetime):
-            start_iso = start_date.isoformat()
-        else:
-            # If it's a date object, convert to datetime then ISO
-            start_iso = datetime.combine(start_date, datetime.min.time()).isoformat()
-            
-        # Handle end date  
+        # Get the due date (end date) and make it a full day event
         if isinstance(end_date, datetime):
-            end_iso = end_date.isoformat()
+            due_date = end_date.date()
         else:
-            # If it's a date object, convert to datetime then ISO
-            end_iso = datetime.combine(end_date, datetime.min.time()).isoformat()
+            due_date = end_date
+            
+        # Create timezone-aware datetimes for proper all-day events
+        # Use your local timezone (change 'America/New_York' to your timezone)
+        local_tz = ZoneInfo("America/New_York")
+        
+        # Start at beginning of day before due date
+        start_datetime = datetime.combine(due_date - timedelta(days=1), datetime.min.time()).replace(tzinfo=local_tz)
+        start_iso = start_datetime.isoformat()
+        
+        # End at beginning of due date (when assignment is actually due)
+        end_datetime = datetime.combine(due_date, datetime.min.time()).replace(tzinfo=local_tz)
+        end_iso = end_datetime.isoformat()
+        
+        # Print the ISO values for debugging
+        print(f"Event: {event['summary']}")
+        print(f"Start ISO: {start_iso}")
+        print(f"End ISO: {end_iso}")
         
         description = event['description'] if event['description'] and event['description'] != 'None' else ""
         
